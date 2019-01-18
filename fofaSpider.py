@@ -1,9 +1,8 @@
 # encoding=utf8
 import fofa
 import argparse
-
-import time
-# python 2.py -m 邮箱 -k fofa的key -r header="thinkphp" -f d.txt -s 1 -e 50
+import multiprocessing
+import time 
 #参数
 def Args():
     parse = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,add_help=False,description='''
@@ -17,7 +16,7 @@ def Args():
     parse.add_argument('-m','--mail',help='Please set mail')
     parse.add_argument('-k','--key',help="Please set key")
     parse.add_argument('-r','--rule',help="Please set rule")
-    parse.add_argument('-f','--file',help='Please set file')
+    parse.add_argument('-f','--file',default='res.txt',help='Please set file')
     parse.add_argument('-s','--start',help='Please set start_page')
     parse.add_argument('-e','--end',help='Please set end_page')
     parse.add_argument('-t','--thread',default=1,help='Please set thread number',type=int)
@@ -44,6 +43,13 @@ def fofaStart(mail,key,rule,file,start,end):
 
 if __name__ == "__main__":
 	args = Args()
-	fofaStart(args.mail,args.key,args.rule,args.file,args.start,args.end)
+	pool = multiprocessing.Pool(processes=int(args.thread))
+	start = time.clock()
+	pool.apply_async(fofaStart,(args.mail,args.key,args.rule,args.file,args.start,args.end,))
+	pool.close()
+	pool.join()
+	end = time.clock()
+	print 'Running time: %f Seconds'%(end-start)
+
 
                      
